@@ -2,6 +2,7 @@ import time
 import datetime
 import requests
 import random
+from zoneinfo import ZoneInfo
 
 BOT_TOKEN = "8837639367:AAEQTwjnl9Ed9Pg9Ln3r6GS1WIjnSlClzG8"
 CHAT_ID = "@tamilstar_otcbot"
@@ -10,6 +11,9 @@ PAIRS = [
     "EUR/USD (OTC)", "GBP/USD (OTC)", "USD/JPY (OTC)", 
     "USD/INR (OTC)", "EUR/GBP (OTC)", "AUD/CAD (OTC)"
 ]
+
+def get_india_time():
+    return datetime.datetime.now(ZoneInfo("Asia/Kolkata"))
 
 def send_telegram_msg(text):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
@@ -39,11 +43,11 @@ def run_bot():
     while True:
         try:
             pair = random.choice(PAIRS)
-            now = datetime.datetime.now()
-            entry_time = (now + datetime.timedelta(minutes=1)).strftime("%H:%M")
+            now = get_india_time()
+            entry_time = (now + datetime.timedelta(minutes=1)).strftime("%I:%M %p")
             
             p0 = get_live_price()
-            direction = "CALL 🟢 (BUY)" if (datetime.datetime.now().second % 2 == 0) else "PUT 🔴 (SELL)"
+            direction = "CALL 🟢 (BUY)" if (now.second % 2 == 0) else "PUT 🔴 (SELL)"
             action = "BUY" if "BUY" in direction else "SELL"
 
             # சிக்னல் மெசேஜ்
@@ -123,3 +127,4 @@ def run_bot():
 
 if __name__ == "__main__":
     run_bot()
+    
